@@ -4,7 +4,9 @@ let colorArray = ["green", "red", "blue", "yellow"];
 let computerGeneratedColors = [];
 let userClickedColors = [];
 let gameButtons = document.querySelectorAll(".game-button");
+let startButton = document.querySelector(".start-game");
 let count = 0;
+let isItComputerTurn = true;
 
 const generateRandomNumber = () => {
   return Math.floor(Math.random() * colorArray.length);
@@ -20,9 +22,9 @@ const getLastUserColor = () => {
 
 const compareColors = () => {
   if (getLastComputerColor() == getLastUserColor()) {
-    return "MATCHYES";
+    return true;
   } else {
-    return "NO";
+    return false;
   }
 };
 
@@ -31,7 +33,9 @@ const generateComputerColor = () => {
   const randomNumber = generateRandomNumber();
   computerGeneratedColors.push(colorArray[randomNumber]);
   const computerColor = getLastComputerColor();
-  console.log("COMPUTER; ", computerColor);
+  // console.log(`%c Computer Color: ${computerColor}`, "color:" + computerColor);
+  let isItComputerTurn = false;
+  console.log("computer turn: ", isItComputerTurn);
 };
 
 const addUserColor = event => {
@@ -39,24 +43,26 @@ const addUserColor = event => {
   let clickedColor = event.currentTarget.dataset.color;
   userClickedColors.push(clickedColor);
   const userColor = getLastUserColor();
-  console.log("%c USER:  userColor", "color: " + userColor);
+  console.log(`%c User Color: ${userColor}`, "color:" + userColor);
+  let isItComputerTurn = true;
+  console.log("User turn: ", isItComputerTurn);
 };
 
 gameButtons.forEach(gameButton => {
   gameButton.addEventListener("click", event => {
-    addUserColor(event);
     generateComputerColor();
+    addUserColor(event);
     const colorComparison = compareColors();
-    console.log("colorComparison ", colorComparison);
-    count++;
+    // console.log("colorComparison ", colorComparison);
+    // if colorComparison returns true,
+    // count++;
+    // generateComputerColor
+    // else {
+    //   Lose.  clear arrays.  disable user buttons.  print computerColors
+    // }
     console.log("count ", count);
   });
 });
-
-// [green, blue, yellow, red]
-// pattern [green, blue, red]
-// input   [green, blue, red]
-//            0     1     2
 
 // TODO
 
