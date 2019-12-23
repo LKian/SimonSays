@@ -1,78 +1,109 @@
-console.log("Simon Says");
-
 let colorArray = ["green", "red", "blue", "yellow"];
-let computerGeneratedColors = [];
-let userClickedColors = [];
+let computerColorsArray = [];
+let userColorsArray = [];
 let gameButtons = document.querySelectorAll(".game-button");
-let startButton = document.querySelector(".start-game");
-let count = 0;
-let isItComputerTurn = true;
-
-const generateRandomNumber = () => {
+let level = 1;
+let initialAmountOfColors = 2;
+let gameLevelText = document.querySelector(".game-level-text");
+let computerArrayText = document.querySelector(
+  ".game-computer-array-container-text"
+);
+let userArrayText = document.querySelector(".game-user-array-container-text");
+let gameTurnText = document.querySelector(".game-turn-text");
+let startGame = document.querySelector(".start-game");
+let generateRandomNumber = () => {
   return Math.floor(Math.random() * colorArray.length);
 };
-
-const getLastComputerColor = () => {
-  return computerGeneratedColors[computerGeneratedColors.length - 1];
+const generateRandomColor = () => {
+  let randomNumber = generateRandomNumber();
+  let color = colorArray[randomNumber];
+  console.log("Computer Random Color::", color);
+  computerArrayText.innerHTML = color;
+  return color;
 };
-
-const getLastUserColor = () => {
-  return userClickedColors, userClickedColors[userClickedColors.length - 1];
+const addComputerColor = () => {
+  let randomColor = generateRandomColor();
+  computerColorsArray.push(randomColor);
+  console.log("computerColorsArray ", computerColorsArray);
 };
-
-const compareColors = () => {
-  if (getLastComputerColor() == getLastUserColor()) {
-    return true;
-  } else {
-    return false;
+const computerTurn = () => {
+  gameLevelText.innerHTML = level;
+  document.querySelector(".game-buttons").classList.add("button-disabled");
+  let index = 0;
+  let timeoutDuration = index === 0 ? 1000 : 1250;
+  const setHighlight = setInterval(highlight, timeoutDuration);
+  function highlight() {
+    if (document.querySelector(".highlight")) {
+      document.querySelector(".highlight").classList.remove("highlight");
+    }
+    if (index === computerColorsArray.length) {
+      document
+        .querySelector(".game-buttons")
+        .classList.remove("button-disabled");
+      return clearInterval(setHighlight);
+    } else {
+      if (index === 0) {
+        document
+          .querySelector(`[data-color=${computerColorsArray[index]}]`)
+          .classList.add("highlight");
+        index++;
+      } else {
+        setTimeout(() => {
+          document
+            .querySelector(`[data-color=${computerColorsArray[index]}]`)
+            .classList.add("highlight");
+          index++;
+        }, 250);
+      }
+    }
   }
 };
-
-// player presses START GAME
-const generateComputerColor = () => {
-  const randomNumber = generateRandomNumber();
-  computerGeneratedColors.push(colorArray[randomNumber]);
-  const computerColor = getLastComputerColor();
-  // console.log(`%c Computer Color: ${computerColor}`, "color:" + computerColor);
-  let isItComputerTurn = false;
-  console.log("computer turn: ", isItComputerTurn);
+//   console.log(`%c Computer Color: ${computerColor}`, "color:" + computerColor);
+// user turn
+const resetGame = () => {
+  level = 1;
+  userColorsArray = [];
+  computerColorsArray = [];
+  gameLevelText.innerHTML = 0;
 };
-
-const addUserColor = event => {
-  event.preventDefault();
-  let clickedColor = event.currentTarget.dataset.color;
-  userClickedColors.push(clickedColor);
-  const userColor = getLastUserColor();
-  console.log(`%c User Color: ${userColor}`, "color:" + userColor);
-  let isItComputerTurn = true;
-  console.log("User turn: ", isItComputerTurn);
-};
-
 gameButtons.forEach(gameButton => {
   gameButton.addEventListener("click", event => {
-    generateComputerColor();
-    addUserColor(event);
-    const colorComparison = compareColors();
-    // console.log("colorComparison ", colorComparison);
-    // if colorComparison returns true,
-    // count++;
-    // generateComputerColor
-    // else {
-    //   Lose.  clear arrays.  disable user buttons.  print computerColors
-    // }
-    console.log("count ", count);
+    let clickedColor = event.currentTarget.dataset.color;
+    userColorsArray.push(clickedColor);
+    console.log(`%cUser Color: ${clickedColor}`, "color:" + clickedColor);
+    let clickedColorIndex = userColorsArray.length - 1;
+    if (
+      userColorsArray[clickedColorIndex] ===
+      computerColorsArray[clickedColorIndex]
+    ) {
+      console.log(`Line 68 colors match.  Level ${level}`);
+    } else {
+      console.log(
+        `colors 70 don't match. You clicked ${clickedColor} instead of ${computerColorsArray[clickedColorIndex]}.  You lost at level ${level}`
+      );
+      resetGame();
+      return alert("Loser");
+    }
+    if (userColorsArray.length === computerColorsArray.length) {
+      console.log("lenghts match'", level);
+      level++;
+      userColorsArray = [];
+      addComputerColor();
+      computerTurn();
+    } else {
+      console.log("don't match lenghts yet 77");
+    }
   });
+  return userColorsArray;
 });
-
-// TODO
-
-// X 1. Build array of colors
-// X 2. Generate random color sequence from your color array - Math.random?
-// 3. Push your color seq. to a new array
-// 4. Match the user input with the color seq. array
-// 5. Add a new color to your seq. array after each user input - If they get it correct clear user input for the next round
-// 6. If the user fails end the sequence and print you're a loser! - Clear both arrays
-
-// User input - Completed
-
-// Delay each light up by 1s for the computer sequence
+/**
+ * Initializes game
+ * Keep adding colors as long as the count is less than the level.
+ */
+const init = () => {
+  for (i = 1; i <= initialAmountOfColors; i++) {
+    addComputerColor();
+  }
+  computerTurn();
+};
+startGame.addEventListener("click", init);
